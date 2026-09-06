@@ -44,7 +44,7 @@
     .top-right-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
     .ad-badge { padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 20px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     
-    /* CLOSE & MUTE BUTTONS */
+    /* CLOSE BUTTON */
     .icon-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; cursor: pointer; transition: transform 0.2s, opacity 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     .icon-btn:active { transform: scale(0.9); }
     #close-btn { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; font-size: 14px; } 
@@ -63,9 +63,6 @@
     /* PROGRESS BAR */
     .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: rgba(255, 255, 255, 0.15); z-index: 1001; }
     .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 12px var(--accent); }
-    
-    /* TAP TO UNMUTE OVERLAY */
-    #unmute-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: white; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 600; pointer-events: none; opacity: 0; transition: opacity 0.4s; z-index: 2000; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -80,7 +77,6 @@
     </div>
     <div class="top-right-controls">
       <div class="ad-badge glass-panel" id="ad-badge-text">Reklama</div>
-      <div class="icon-btn glass-panel" id="mute-btn" style="display: none;">🔇</div>
       <div class="icon-btn glass-panel" id="close-btn">✖</div>
     </div>
   </div>
@@ -94,8 +90,6 @@
   </div>
   
   <div class="progress-bg" id="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-  
-  <div id="unmute-overlay">🔈 Stuknij, aby włączyć dźwięk</div>
 
   <video id="vid" playsinline webkit-playsinline autoplay muted preload="auto"></video>
   <img id="pic" fetchpriority="high" decoding="sync" />
@@ -111,11 +105,11 @@
     
     // --- REAL APP STORE LINKS ---
     const appStoreLinks = [
-      "https://apps.apple.com/pl/app/tiktok/id835599320", // TikTok
-      "https://apps.apple.com/pl/app/instagram/id389801252", // Instagram
-      "https://apps.apple.com/pl/app/spotify-music-and-podcasts/id324684580", // Spotify
-      "https://apps.apple.com/pl/app/youtube-watch-listen-stream/id544007664", // YouTube
-      "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997" // WhatsApp
+      "https://apps.apple.com/pl/app/tiktok/id835599320", 
+      "https://apps.apple.com/pl/app/instagram/id389801252", 
+      "https://apps.apple.com/pl/app/spotify-music-and-podcasts/id324684580", 
+      "https://apps.apple.com/pl/app/youtube-watch-listen-stream/id544007664", 
+      "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997"
     ];
 
     // Pick a random theme and a random App Store link every time the page loads
@@ -140,11 +134,9 @@
     const vid = document.getElementById('vid');
     const pic = document.getElementById('pic');
     const closeBtn = document.getElementById('close-btn');
-    const muteBtn = document.getElementById('mute-btn');
     const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
     const ctaBanner = document.getElementById('cta-banner');
-    const unmuteOverlay = document.getElementById('unmute-overlay');
     
     // URL Logic
     const urlParams = new URLSearchParams(window.location.search);
@@ -161,33 +153,8 @@
         vid.src = mediaLink;
         vid.muted = true;
         vid.playsInline = true;
-        muteBtn.style.display = 'flex';
-
-        // Show tap to unmute hint
-        setTimeout(() => { if(vid.muted) unmuteOverlay.style.opacity = '1'; }, 1000);
-        setTimeout(() => { unmuteOverlay.style.opacity = '0'; }, 3500);
 
         vid.play().catch(() => {});
-
-        // Toggle Mute/Pause on tap
-        document.body.addEventListener('click', (e) => {
-          if(e.target === closeBtn || e.target === muteBtn || ctaBanner.contains(e.target)) return;
-          
-          if(vid.muted) {
-            vid.muted = false;
-            muteBtn.innerText = "🔊";
-            unmuteOverlay.style.opacity = '0';
-          } else {
-            if(vid.paused) vid.play();
-            else vid.pause();
-          }
-        });
-
-        muteBtn.addEventListener('click', () => {
-          vid.muted = !vid.muted;
-          muteBtn.innerText = vid.muted ? "🔇" : "🔊";
-          unmuteOverlay.style.opacity = '0';
-        });
 
         // Time logic
         vid.ontimeupdate = () => {
