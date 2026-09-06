@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Global Media Delivery</title>
+  <title>Reklama</title>
   
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -32,8 +32,8 @@
     /* GLASSMORPHISM UI */
     .glass-panel { background: rgba(20, 20, 20, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
     
-    /* TOP CONTROLS (With Safe Area for iPhone Notches) */
-    .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: calc(env(safe-area-inset-top, 15px) + 15px) 20px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); opacity: 0; animation: fadeIn 1s ease 0.5s forwards; }
+    /* TOP CONTROLS (Fades in INSTANTLY) */
+    .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: calc(env(safe-area-inset-top, 15px) + 15px) 20px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); opacity: 0; animation: fadeInFast 0.2s ease 0.1s forwards; }
     
     .sponsor-header { display: flex; align-items: center; gap: 12px; }
     .sponsor-avatar { width: 42px; height: 42px; border-radius: 12px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.25); }
@@ -46,27 +46,30 @@
     /* BOTTOM MASK GRADIENT */
     .bottom-mask { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 999; pointer-events: none; }
 
-    /* BOTTOM CTA BANNER (With Slide-Up Animation) */
-    .cta-banner { position: absolute; bottom: calc(env(safe-area-inset-bottom, 15px) + 25px); left: 15px; right: 15px; border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; z-index: 1000; cursor: pointer; pointer-events: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); transition: transform 0.2s, background 0.2s; transform: translateY(150px); opacity: 0; animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards; }
-    .cta-banner:active { transform: scale(0.97) !important; background: rgba(40, 40, 40, 0.5); }
+    /* BOTTOM CTA BANNER (Locked initially, fades/slides up normally) */
+    .cta-banner { position: absolute; bottom: calc(env(safe-area-inset-bottom, 15px) + 25px); left: 15px; right: 15px; border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; z-index: 1000; cursor: pointer; pointer-events: none; opacity: 0.5; filter: saturate(0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.6); transition: transform 0.2s, background 0.2s, opacity 0.4s, filter 0.4s; transform: translateY(150px); animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
+    
+    /* UNLOCKED STATE (Applied via JS after 5 seconds) */
+    .cta-banner.unlocked { pointer-events: auto; opacity: 1; filter: saturate(1); }
+    .cta-banner.unlocked:active { transform: scale(0.97) !important; background: rgba(40, 40, 40, 0.5); }
     
     .cta-text { flex: 1; min-width: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
     .cta-text p { margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cta-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; } 
     .cta-subtitle { font-size: 13px; opacity: 0.85; margin-top: 3px; font-weight: 500; }
     
-    /* CTA BUTTON WITH SHIMMER EFFECT */
+    /* CTA BUTTON */
     .cta-button { position: relative; font-size: 14px; font-weight: 800; padding: 12px 24px; border-radius: 24px; text-transform: uppercase; letter-spacing: 0.5px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
     
-    /* The light sweep animation */
-    .cta-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shimmer 3s infinite; }
+    /* Shimmer effect only activates when unlocked */
+    .cta-banner.unlocked .cta-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shimmer 3s infinite; }
     
     /* PROGRESS BAR */
     .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.2); z-index: 1001; }
     .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 15px var(--accent); border-radius: 0 4px 4px 0; }
     
-    /* ANIMATION KEYFRAMES */
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* ANIMATIONS */
+    @keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(150px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes shimmer { 0% { left: -100%; } 15% { left: 200%; } 100% { left: 200%; } }
   </style>
@@ -117,11 +120,9 @@
       "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997"
     ];
 
-    // Initialize Randomizers
     const theme = adThemes[Math.floor(Math.random() * adThemes.length)];
     const randomApp = appStoreLinks[Math.floor(Math.random() * appStoreLinks.length)];
     
-    // Inject Theme Values
     document.documentElement.style.setProperty('--accent', theme.accent);
     document.getElementById('brand-title').innerText = theme.brand;
     document.getElementById('brand-sub').innerText = theme.sub;
@@ -135,16 +136,24 @@
     actionBtn.style.color = theme.btnColor;
     document.getElementById('progress-bar').style.background = theme.accent;
 
-    // Element References
     const vid = document.getElementById('vid');
     const pic = document.getElementById('pic');
     const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
     const ctaBanner = document.getElementById('cta-banner');
     
-    // URL Logic
     const urlParams = new URLSearchParams(window.location.search);
     const mediaLink = urlParams.get('media'); 
+
+    let isUnlocked = false;
+    const UNLOCK_DELAY = 5; // Seconds before banner unlocks
+
+    function unlockBanner() {
+      if (!isUnlocked) {
+        isUnlocked = true;
+        ctaBanner.classList.add('unlocked');
+      }
+    }
 
     if (mediaLink) {
       const isVideo = mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov');
@@ -157,17 +166,22 @@
 
         vid.play().catch(() => {});
 
-        // Time logic and Progress Bar updating
         vid.ontimeupdate = () => {
           if (vid.duration) {
-            progressBar.style.width = (vid.currentTime / vid.duration) * 100 + "%";
-            let timeLeft = Math.ceil(vid.duration - vid.currentTime);
+            let currentSec = vid.currentTime;
+            progressBar.style.width = (currentSec / vid.duration) * 100 + "%";
+            let timeLeft = Math.ceil(vid.duration - currentSec);
             badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
+            
+            // Unlock banner after 5 seconds
+            if (currentSec >= UNLOCK_DELAY) {
+              unlockBanner();
+            }
           }
         };
 
         vid.onended = () => {
-          vid.play(); // Loop seamlessly
+          vid.play(); 
         };
 
       } else {
@@ -176,18 +190,28 @@
         pic.src = mediaLink;
         document.getElementById('progress-container').style.display = 'none';
         
+        let elapsed = 0;
         let timeLeft = 10;
         badge.innerText = "Reklama • 0:" + timeLeft;
         
-        setInterval(() => {
+        let timer = setInterval(() => {
+          elapsed++;
           if (timeLeft > 0) timeLeft--;
           badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
+          
+          if (elapsed >= UNLOCK_DELAY) {
+            unlockBanner();
+          }
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+          }
         }, 1000);
       }
     }
 
-    // OPEN RANDOM APP STORE LINK
+    // OPEN RANDOM APP STORE LINK (Only works if 5 seconds have passed)
     ctaBanner.addEventListener('click', () => {
+      if (!isUnlocked) return;
       window.open(randomApp, '_blank');
     });
   </script>
