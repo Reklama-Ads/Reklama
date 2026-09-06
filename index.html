@@ -5,6 +5,7 @@
   
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="Cache-Control" content="max-age=31536000, public, immutable">
   
   <!-- PRELOADER -->
@@ -26,37 +27,48 @@
     }
     body, html { margin: 0; padding: 0; background-color: #000; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
-    video, img { width: 100%; height: 100%; object-fit: contain; transform: translateZ(0); display: none; }
+    video, img { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); display: none; pointer-events: none; }
     
     /* GLASSMORPHISM UI */
-    .glass-panel { background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
+    .glass-panel { background: rgba(20, 20, 20, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
     
-    /* TOP CONTROLS */
-    .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 15px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); }
+    /* TOP CONTROLS (With Safe Area for iPhone Notches) */
+    .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: calc(env(safe-area-inset-top, 15px) + 15px) 20px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); opacity: 0; animation: fadeIn 1s ease 0.5s forwards; }
     
-    .sponsor-header { display: flex; align-items: center; gap: 10px; }
-    .sponsor-avatar { width: 40px; height: 40px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); }
-    .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-    .brand-name { font-size: 15px; font-weight: 700; }
-    .sponsored-tag { font-size: 11px; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sponsor-header { display: flex; align-items: center; gap: 12px; }
+    .sponsor-avatar { width: 42px; height: 42px; border-radius: 12px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.25); }
+    .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .brand-name { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
+    .sponsored-tag { font-size: 11px; opacity: 0.85; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
     
-    .top-right-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
-    .ad-badge { padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 20px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .ad-badge { padding: 5px 12px; font-size: 12px; font-weight: 800; border-radius: 20px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
     
-    /* BOTTOM CTA BANNER */
-    .cta-banner { position: absolute; bottom: 25px; left: 15px; right: 15px; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 1000; cursor: pointer; pointer-events: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.2s; }
-    .cta-banner:active { transform: scale(0.98); }
-    .cta-text { flex: 1; min-width: 0; }
+    /* BOTTOM MASK GRADIENT */
+    .bottom-mask { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 999; pointer-events: none; }
+
+    /* BOTTOM CTA BANNER (With Slide-Up Animation) */
+    .cta-banner { position: absolute; bottom: calc(env(safe-area-inset-bottom, 15px) + 25px); left: 15px; right: 15px; border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; z-index: 1000; cursor: pointer; pointer-events: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); transition: transform 0.2s, background 0.2s; transform: translateY(150px); opacity: 0; animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards; }
+    .cta-banner:active { transform: scale(0.97) !important; background: rgba(40, 40, 40, 0.5); }
+    
+    .cta-text { flex: 1; min-width: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
     .cta-text p { margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cta-title { font-size: 16px; font-weight: 700; } 
-    .cta-subtitle { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+    .cta-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; } 
+    .cta-subtitle { font-size: 13px; opacity: 0.85; margin-top: 3px; font-weight: 500; }
     
-    .cta-button { font-size: 14px; font-weight: 800; padding: 10px 20px; border-radius: 24px; text-transform: uppercase; letter-spacing: 0.5px; animation: gentlePulse 2s infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-    @keyframes gentlePulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    /* CTA BUTTON WITH SHIMMER EFFECT */
+    .cta-button { position: relative; font-size: 14px; font-weight: 800; padding: 12px 24px; border-radius: 24px; text-transform: uppercase; letter-spacing: 0.5px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+    
+    /* The light sweep animation */
+    .cta-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shimmer 3s infinite; }
     
     /* PROGRESS BAR */
-    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: rgba(255, 255, 255, 0.15); z-index: 1001; }
-    .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 12px var(--accent); }
+    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.2); z-index: 1001; }
+    .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 15px var(--accent); border-radius: 0 4px 4px 0; }
+    
+    /* ANIMATION KEYFRAMES */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(150px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes shimmer { 0% { left: -100%; } 15% { left: 200%; } 100% { left: 200%; } }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -69,10 +81,10 @@
         <p class="sponsored-tag" id="brand-sub">Reklama</p>
       </div>
     </div>
-    <div class="top-right-controls">
-      <div class="ad-badge glass-panel" id="ad-badge-text">Reklama</div>
-    </div>
+    <div class="ad-badge glass-panel" id="ad-badge-text">Reklama</div>
   </div>
+
+  <div class="bottom-mask"></div>
 
   <div class="cta-banner glass-panel" id="cta-banner">
     <div class="cta-text">
@@ -105,11 +117,11 @@
       "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997"
     ];
 
-    // Pick a random theme and a random App Store link every time the page loads
+    // Initialize Randomizers
     const theme = adThemes[Math.floor(Math.random() * adThemes.length)];
     const randomApp = appStoreLinks[Math.floor(Math.random() * appStoreLinks.length)];
     
-    // Inject Theme
+    // Inject Theme Values
     document.documentElement.style.setProperty('--accent', theme.accent);
     document.getElementById('brand-title').innerText = theme.brand;
     document.getElementById('brand-sub').innerText = theme.sub;
@@ -123,7 +135,7 @@
     actionBtn.style.color = theme.btnColor;
     document.getElementById('progress-bar').style.background = theme.accent;
 
-    // Elements
+    // Element References
     const vid = document.getElementById('vid');
     const pic = document.getElementById('pic');
     const badge = document.getElementById('ad-badge-text');
@@ -145,7 +157,7 @@
 
         vid.play().catch(() => {});
 
-        // Time logic
+        // Time logic and Progress Bar updating
         vid.ontimeupdate = () => {
           if (vid.duration) {
             progressBar.style.width = (vid.currentTime / vid.duration) * 100 + "%";
