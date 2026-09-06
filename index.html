@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reklama</title>
+  <title>Global Media Delivery</title>
   
-  <!-- SECURITY BYPASS: Hides the player's identity to prevent hotlink blocking -->
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  
-  <!-- THE CACHE UPGRADE: Forces Safari to memorize this page locally -->
   <meta http-equiv="Cache-Control" content="max-age=31536000, public, immutable">
   
-  <!-- INSTANT PRELOADER: Starts downloading the media before the page renders -->
+  <!-- PRELOADER -->
   <script>
     const _p = new URLSearchParams(window.location.search);
     const _m = _p.get('media');
@@ -22,198 +19,234 @@
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍿</text></svg>">
-  
+
   <style>
-    body, html { margin: 0; padding: 0; background-color: black; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, sans-serif; }
+    :root {
+      --accent: #007aff;
+    }
+    body, html { margin: 0; padding: 0; background-color: #000; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
+    /* object-fit: cover stretches the video to fill the black voids */
     video, img { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); display: none; }
     
-    .ad-badge { position: absolute; top: 15px; right: 15px; background-color: rgba(0, 0, 0, 0.8); color: #ffffff; padding: 4px 10px; font-size: 13px; font-weight: bold; border-radius: 4px; z-index: 1000; border: 1px solid rgba(255,255,255,0.3); pointer-events: none; }
-    .sponsor-header { position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 10px; z-index: 1000; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); pointer-events: none; }
+    /* GLASSMORPHISM UI */
+    .glass-panel { background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
     
-    /* DYNAMIC SPONSOR ICON CONTAINER */
-    .sponsor-avatar { width: 34px; height: 34px; border-radius: 50%; background: #111; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    /* TOP CONTROLS */
+    .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 15px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%); }
     
-    .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; }
-    .brand-name { font-size: 13px; font-weight: bold; }
-    .sponsored-tag { font-size: 11px; opacity: 0.9; }
+    .sponsor-header { display: flex; align-items: center; gap: 10px; }
+    .sponsor-avatar { width: 40px; height: 40px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); }
+    .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    .brand-name { font-size: 15px; font-weight: 700; }
+    .sponsored-tag { font-size: 11px; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    .cta-banner { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 15px; box-sizing: border-box; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.2); pointer-events: none; }
+    .top-right-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
+    .ad-badge { padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 20px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    
+    /* CLOSE & MUTE BUTTONS */
+    .icon-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; cursor: pointer; transition: transform 0.2s, opacity 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .icon-btn:active { transform: scale(0.9); }
+    #close-btn { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; font-size: 14px; } 
+    
+    /* BOTTOM CTA BANNER */
+    .cta-banner { position: absolute; bottom: 25px; left: 15px; right: 15px; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 1000; cursor: pointer; pointer-events: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.2s; }
+    .cta-banner:active { transform: scale(0.98); }
     .cta-text { flex: 1; min-width: 0; }
     .cta-text p { margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cta-title { font-size: 13px; font-weight: bold; } 
-    .cta-subtitle { font-size: 11px; opacity: 0.8; margin-top: 2px; }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
-    .cta-button { flex-shrink: 0; font-size: 13px; font-weight: 900; padding: 8px 16px; border-radius: 20px; animation: pulse 1.5s infinite; }
+    .cta-title { font-size: 16px; font-weight: 700; } 
+    .cta-subtitle { font-size: 13px; opacity: 0.8; margin-top: 2px; }
     
-    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255, 255, 255, 0.2); z-index: 1001; pointer-events: none; }
-    .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; }
+    .cta-button { font-size: 14px; font-weight: 800; padding: 10px 20px; border-radius: 24px; text-transform: uppercase; letter-spacing: 0.5px; animation: gentlePulse 2s infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+    @keyframes gentlePulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
     
-    .skip-btn { position: absolute; bottom: 75px; right: 15px; background-color: rgba(0, 0, 0, 0.8); color: #ffffff; padding: 5px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); z-index: 2000; opacity: 1; pointer-events: none; transition: opacity 0.3s; }
+    /* PROGRESS BAR */
+    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: rgba(255, 255, 255, 0.15); z-index: 1001; }
+    .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 12px var(--accent); }
+    
+    /* TAP TO UNMUTE OVERLAY */
+    #unmute-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: white; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 600; pointer-events: none; opacity: 0; transition: opacity 0.4s; z-index: 2000; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body oncontextmenu="return false;">
   
-  <div class="ad-badge" id="ad-badge-text">Ad</div>
-  <div class="sponsor-header">
-    <div class="sponsor-avatar" id="sponsor-icon">⚡️</div>
-    <div class="sponsor-text-group">
-      <p class="brand-name" id="brand-title">Sponsored Ad</p>
-      <p class="sponsored-tag" id="brand-sub">Advertising</p>
+  <div class="top-bar">
+    <div class="sponsor-header">
+      <div class="sponsor-avatar" id="sponsor-icon">⚡️</div>
+      <div class="sponsor-text-group">
+        <p class="brand-name" id="brand-title">Sponsorowane</p>
+        <p class="sponsored-tag" id="brand-sub">Reklama</p>
+      </div>
+    </div>
+    <div class="top-right-controls">
+      <div class="ad-badge glass-panel" id="ad-badge-text">Reklama</div>
+      <div class="icon-btn glass-panel" id="mute-btn" style="display: none;">🔇</div>
+      <div class="icon-btn glass-panel" id="close-btn">✖</div>
     </div>
   </div>
-  <div class="cta-banner" id="cta-banner">
+
+  <div class="cta-banner glass-panel" id="cta-banner">
     <div class="cta-text">
-      <p class="cta-title" id="cta-headline">Advertisement Offer</p>
-      <p class="cta-subtitle" id="cta-subtext">Sponsored Content</p>
+      <p class="cta-title" id="cta-headline">Polecana Aplikacja</p>
+      <p class="cta-subtitle" id="cta-subtext">Stuknij, aby sprawdzić</p>
     </div>
-    <div class="cta-button" id="cta-btn">Learn More ➔</div>
+    <div class="cta-button" id="cta-btn">Zainstaluj</div>
   </div>
   
   <div class="progress-bg" id="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-  <div class="skip-btn" id="skip-btn">Loading...</div>
+  
+  <div id="unmute-overlay">🔈 Stuknij, aby włączyć dźwięk</div>
 
-  <!-- MEDIA ELEMENTS: decoding="sync" makes image load faster -->
   <video id="vid" playsinline webkit-playsinline autoplay muted preload="auto"></video>
   <img id="pic" fetchpriority="high" decoding="sync" />
 
   <script>
-    // --- UI RANDOMIZER WITH ICONS ---
+    // --- PROFESSIONAL POLISH THEMES ---
     const adThemes = [
-      { brand: "Sponsored Ad", sub: "Advertising Network", badge: "Ad • 1 of 1", title: "Advertisement Feature", subtitle: "Sponsored Media Content", btnText: "Learn More ➔", accent: "#ffa31a", btnBg: "#ffa31a", btnColor: "#000000", icon: "⚡️" },
-      { brand: "Paid Advertising", sub: "Sponsored Partner", badge: "Ads", title: "Exclusive Advertisement", subtitle: "Sponsored Promotion", btnText: "View Ad ➔", accent: "#007aff", btnBg: "#007aff", btnColor: "#ffffff", icon: "💎" },
-      { brand: "Sponsored Feed", sub: "Ad Network", badge: "Ad (0:05)", title: "Advertising Display", subtitle: "Sponsored Clip Showcase", btnText: "Open Ad ➔", accent: "#ff3333", btnBg: "#ff3333", btnColor: "#ffffff", icon: "🚀" }
+      { brand: "Sponsorowane", sub: "Sieć Reklamowa", title: "Polecana Aplikacja", subtitle: "Zainstaluj teraz", btnText: "Zainstaluj", accent: "#0A84FF", btnBg: "#0A84FF", btnColor: "#ffffff", icon: "💎" },
+      { brand: "Płatna Promocja", sub: "Partner", title: "Ekskluzywna Oferta", subtitle: "Sprawdź szczegóły w App Store", btnText: "Otwórz", accent: "#FF453A", btnBg: "#FF453A", btnColor: "#ffffff", icon: "🚀" },
+      { brand: "Reklama", sub: "Sponsorowane", title: "Odkryj Nowości", subtitle: "Dowiedz się więcej", btnText: "Pobierz", accent: "#32ADE6", btnBg: "#32ADE6", btnColor: "#ffffff", icon: "⚡️" },
+      { brand: "Polecane", sub: "Aplikacja", title: "Najlepszy Wybór", subtitle: "Stuknij, aby pobrać", btnText: "Sprawdź", accent: "#34C759", btnBg: "#34C759", btnColor: "#ffffff", icon: "🔥" }
     ];
-    const currentTheme = adThemes[Math.floor(Math.random() * adThemes.length)];
     
-    document.getElementById('ad-badge-text').innerText = currentTheme.badge;
-    document.getElementById('brand-title').innerText = currentTheme.brand;
-    document.getElementById('brand-sub').innerText = currentTheme.sub;
-    document.getElementById('cta-headline').innerText = currentTheme.title;
-    document.getElementById('cta-subtext').innerText = currentTheme.subtitle;
-    document.getElementById('sponsor-icon').innerText = currentTheme.icon;
+    // --- REAL APP STORE LINKS ---
+    const appStoreLinks = [
+      "https://apps.apple.com/pl/app/tiktok/id835599320", // TikTok
+      "https://apps.apple.com/pl/app/instagram/id389801252", // Instagram
+      "https://apps.apple.com/pl/app/spotify-music-and-podcasts/id324684580", // Spotify
+      "https://apps.apple.com/pl/app/youtube-watch-listen-stream/id544007664", // YouTube
+      "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997" // WhatsApp
+    ];
+
+    // Pick a random theme and a random App Store link every time the page loads
+    const theme = adThemes[Math.floor(Math.random() * adThemes.length)];
+    const randomApp = appStoreLinks[Math.floor(Math.random() * appStoreLinks.length)];
+    
+    // Inject Theme
+    document.documentElement.style.setProperty('--accent', theme.accent);
+    document.getElementById('brand-title').innerText = theme.brand;
+    document.getElementById('brand-sub').innerText = theme.sub;
+    document.getElementById('cta-headline').innerText = theme.title;
+    document.getElementById('cta-subtext').innerText = theme.subtitle;
+    document.getElementById('sponsor-icon').innerText = theme.icon;
     
     const actionBtn = document.getElementById('cta-btn');
-    actionBtn.innerText = currentTheme.btnText;
-    actionBtn.style.background = currentTheme.btnBg;
-    actionBtn.style.color = currentTheme.btnColor;
-    document.getElementById('progress-bar').style.background = currentTheme.accent;
+    actionBtn.innerText = theme.btnText;
+    actionBtn.style.background = theme.btnBg;
+    actionBtn.style.color = theme.btnColor;
+    document.getElementById('progress-bar').style.background = theme.accent;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const mediaLink = urlParams.get('media'); 
-    const timeJump = urlParams.get('jump');
-
+    // Elements
     const vid = document.getElementById('vid');
     const pic = document.getElementById('pic');
-    const skipBtn = document.getElementById('skip-btn');
-    const progressContainer = document.getElementById('progress-container');
+    const closeBtn = document.getElementById('close-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
+    const ctaBanner = document.getElementById('cta-banner');
+    const unmuteOverlay = document.getElementById('unmute-overlay');
     
-    let canSkip = false;
+    // URL Logic
+    const urlParams = new URLSearchParams(window.location.search);
+    const mediaLink = urlParams.get('media'); 
+    
+    let canClose = false;
+    const CLOSE_DELAY = 5; // Seconds before the X button appears
 
     if (mediaLink) {
       const isVideo = mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov');
       
       if (isVideo) {
-        // --- VIDEO MODE ---
         vid.style.display = 'block'; 
         vid.src = mediaLink;
-        
-        let jumpSeconds = 0;
-        if (timeJump && !isNaN(timeJump)) {
-          jumpSeconds = parseFloat(timeJump) * 60;
-        }
-
-        vid.addEventListener('loadedmetadata', function() {
-          if (jumpSeconds > 0 && jumpSeconds < vid.duration) {
-            vid.currentTime = jumpSeconds;
-          }
-        });
-
         vid.muted = true;
-        vid.defaultMuted = true;
         vid.playsInline = true;
+        muteBtn.style.display = 'flex';
 
-        function forcePlay() {
-          let playPromise = vid.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              skipBtn.innerText = "Tap screen to play";
-              skipBtn.style.pointerEvents = 'auto'; 
-            });
+        // Show tap to unmute hint
+        setTimeout(() => { if(vid.muted) unmuteOverlay.style.opacity = '1'; }, 1000);
+        setTimeout(() => { unmuteOverlay.style.opacity = '0'; }, 3500);
+
+        vid.play().catch(() => {});
+
+        // Toggle Mute/Pause on tap
+        document.body.addEventListener('click', (e) => {
+          if(e.target === closeBtn || e.target === muteBtn || ctaBanner.contains(e.target)) return;
+          
+          if(vid.muted) {
+            vid.muted = false;
+            muteBtn.innerText = "🔊";
+            unmuteOverlay.style.opacity = '0';
+          } else {
+            if(vid.paused) vid.play();
+            else vid.pause();
           }
-        }
-        
-        vid.onloadeddata = forcePlay;
-        if (vid.readyState >= 2) forcePlay();
-
-        document.body.addEventListener('click', function(e) {
-          if (e.target !== skipBtn && vid.paused) vid.play().catch(() => {});
         });
 
-        vid.ontimeupdate = function() {
+        muteBtn.addEventListener('click', () => {
+          vid.muted = !vid.muted;
+          muteBtn.innerText = vid.muted ? "🔇" : "🔊";
+          unmuteOverlay.style.opacity = '0';
+        });
+
+        // Time logic
+        vid.ontimeupdate = () => {
           if (vid.duration) {
-            let percentage = (vid.currentTime / vid.duration) * 100;
-            progressBar.style.width = percentage + "%";
+            progressBar.style.width = (vid.currentTime / vid.duration) * 100 + "%";
+            let timeLeft = Math.ceil(vid.duration - vid.currentTime);
+            badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
             
-            if (!canSkip) {
-              let timeLeft = Math.ceil(vid.duration - vid.currentTime);
-              if (timeLeft > 0) {
-                skipBtn.innerText = "Skip ad in " + timeLeft;
-              } else {
-                skipBtn.innerText = "Skip Ad";
-                skipBtn.style.pointerEvents = 'auto';
-                canSkip = true;
-              }
+            if (vid.currentTime >= CLOSE_DELAY && !canClose) {
+              closeBtn.style.opacity = '1';
+              closeBtn.style.pointerEvents = 'auto';
+              canClose = true;
             }
           }
         };
 
-        vid.onended = function() {
-          vid.play(); 
-          if (!canSkip) {
-            skipBtn.innerText = "Skip Ad";
-            skipBtn.style.pointerEvents = 'auto';
-            canSkip = true;
-          }
+        vid.onended = () => {
+          vid.play(); // Loop
+          closeBtn.style.opacity = '1';
+          closeBtn.style.pointerEvents = 'auto';
+          canClose = true;
         };
 
       } else {
-        // --- PHOTO MODE ---
+        // IMAGE MODE
         pic.style.display = 'block'; 
         pic.src = mediaLink;
-        progressContainer.style.display = 'none'; 
+        document.getElementById('progress-container').style.display = 'none';
         
-        let photoTimeLeft = 10;
-        skipBtn.innerText = "Skip ad in " + photoTimeLeft;
+        let timeLeft = 10;
+        badge.innerText = "Reklama • 0:" + timeLeft;
         
-        let photoTimer = setInterval(() => {
-          photoTimeLeft--;
-          if (photoTimeLeft > 0) {
-            skipBtn.innerText = "Skip ad in " + photoTimeLeft;
-          } else {
-            skipBtn.innerText = "Skip Ad";
-            skipBtn.style.pointerEvents = 'auto';
-            canSkip = true;
-            clearInterval(photoTimer);
+        setInterval(() => {
+          if (timeLeft > 0) timeLeft--;
+          badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
+          
+          if (10 - timeLeft >= CLOSE_DELAY && !canClose) {
+            closeBtn.style.opacity = '1';
+            closeBtn.style.pointerEvents = 'auto';
+            canClose = true;
           }
         }, 1000);
       }
     } else {
-      skipBtn.innerText = "Skip Ad";
-      skipBtn.style.pointerEvents = 'auto';
-      canSkip = true;
+      // Fallback if no link
+      closeBtn.style.opacity = '1';
+      closeBtn.style.pointerEvents = 'auto';
+      canClose = true;
     }
 
-    // --- CLICK SKIP LOGIC ---
-    skipBtn.addEventListener('click', function(e) {
-      e.preventDefault(); e.stopPropagation(); 
-      if (!canSkip) return; 
-      
-      const isVideo = mediaLink && (mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov'));
-      if (isVideo && !vid.paused === false) return; 
-      
-      window.open("https://www.google.com", '_blank');
+    // ACTIONS
+    closeBtn.addEventListener('click', () => {
+      window.close();
+      window.open("about:blank", "_self");
+    });
+
+    // OPEN RANDOM APP STORE LINK
+    ctaBanner.addEventListener('click', () => {
+      window.open(randomApp, '_blank');
     });
   </script>
 </body>
