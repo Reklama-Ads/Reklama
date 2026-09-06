@@ -26,8 +26,7 @@
     }
     body, html { margin: 0; padding: 0; background-color: #000; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
-    /* object-fit: cover stretches the video to fill the black voids */
-    video, img { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); display: none; }
+    video, img { width: 100%; height: 100%; object-fit: contain; transform: translateZ(0); display: none; }
     
     /* GLASSMORPHISM UI */
     .glass-panel { background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); }
@@ -43,11 +42,6 @@
     
     .top-right-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; }
     .ad-badge { padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 20px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    
-    /* CLOSE BUTTON */
-    .icon-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; cursor: pointer; transition: transform 0.2s, opacity 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .icon-btn:active { transform: scale(0.9); }
-    #close-btn { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; font-size: 14px; } 
     
     /* BOTTOM CTA BANNER */
     .cta-banner { position: absolute; bottom: 25px; left: 15px; right: 15px; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 1000; cursor: pointer; pointer-events: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.2s; }
@@ -77,7 +71,6 @@
     </div>
     <div class="top-right-controls">
       <div class="ad-badge glass-panel" id="ad-badge-text">Reklama</div>
-      <div class="icon-btn glass-panel" id="close-btn">✖</div>
     </div>
   </div>
 
@@ -133,7 +126,6 @@
     // Elements
     const vid = document.getElementById('vid');
     const pic = document.getElementById('pic');
-    const closeBtn = document.getElementById('close-btn');
     const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
     const ctaBanner = document.getElementById('cta-banner');
@@ -141,9 +133,6 @@
     // URL Logic
     const urlParams = new URLSearchParams(window.location.search);
     const mediaLink = urlParams.get('media'); 
-    
-    let canClose = false;
-    const CLOSE_DELAY = 5; // Seconds before the X button appears
 
     if (mediaLink) {
       const isVideo = mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov');
@@ -162,20 +151,11 @@
             progressBar.style.width = (vid.currentTime / vid.duration) * 100 + "%";
             let timeLeft = Math.ceil(vid.duration - vid.currentTime);
             badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-            
-            if (vid.currentTime >= CLOSE_DELAY && !canClose) {
-              closeBtn.style.opacity = '1';
-              closeBtn.style.pointerEvents = 'auto';
-              canClose = true;
-            }
           }
         };
 
         vid.onended = () => {
-          vid.play(); // Loop
-          closeBtn.style.opacity = '1';
-          closeBtn.style.pointerEvents = 'auto';
-          canClose = true;
+          vid.play(); // Loop seamlessly
         };
 
       } else {
@@ -190,26 +170,9 @@
         setInterval(() => {
           if (timeLeft > 0) timeLeft--;
           badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-          
-          if (10 - timeLeft >= CLOSE_DELAY && !canClose) {
-            closeBtn.style.opacity = '1';
-            closeBtn.style.pointerEvents = 'auto';
-            canClose = true;
-          }
         }, 1000);
       }
-    } else {
-      // Fallback if no link
-      closeBtn.style.opacity = '1';
-      closeBtn.style.pointerEvents = 'auto';
-      canClose = true;
     }
-
-    // ACTIONS
-    closeBtn.addEventListener('click', () => {
-      window.close();
-      window.open("about:blank", "_self");
-    });
 
     // OPEN RANDOM APP STORE LINK
     ctaBanner.addEventListener('click', () => {
