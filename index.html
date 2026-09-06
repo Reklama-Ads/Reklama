@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reklama</title>
+  
+  <!-- SECURITY BYPASS: Hides the player's identity to prevent hotlink blocking -->
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  
+  <!-- THE CACHE UPGRADE: Forces Safari to memorize this page locally -->
+  <meta http-equiv="Cache-Control" content="max-age=31536000, public, immutable">
+  
+  <!-- INSTANT PRELOADER: Starts downloading the media before the page renders -->
+  <script>
+    const _p = new URLSearchParams(window.location.search);
+    const _m = _p.get('media');
+    if (_m) {
+      const _isV = _m.toLowerCase().includes('.mp4') || _m.toLowerCase().includes('.mov');
+      document.write('<link rel="preload" as="' + (_isV ? 'video' : 'image') + '" href="' + _m + '" fetchpriority="high">');
+    }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍿</text></svg>">
+  
+  <style>
+    body, html { margin: 0; padding: 0; background-color: black; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, sans-serif; }
+    
+    video, img { width: 100%; height: 100%; object-fit: contain; transform: translateZ(0); display: none; }
+    
+    .ad-badge { position: absolute; top: 15px; right: 15px; background-color: rgba(0, 0, 0, 0.8); color: #ffffff; padding: 4px 10px; font-size: 13px; font-weight: bold; border-radius: 4px; z-index: 1000; border: 1px solid rgba(255,255,255,0.3); pointer-events: none; }
+    .sponsor-header { position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 10px; z-index: 1000; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); pointer-events: none; }
+    
+    /* DYNAMIC SPONSOR ICON CONTAINER */
+    .sponsor-avatar { width: 34px; height: 34px; border-radius: 50%; background: #111; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    
+    .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; }
+    .brand-name { font-size: 13px; font-weight: bold; }
+    .sponsored-tag { font-size: 11px; opacity: 0.9; }
+    
+    .cta-banner { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 15px; box-sizing: border-box; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.2); pointer-events: none; }
+    .cta-text { flex: 1; min-width: 0; }
+    .cta-text p { margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cta-title { font-size: 13px; font-weight: bold; } 
+    .cta-subtitle { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    .cta-button { flex-shrink: 0; font-size: 13px; font-weight: 900; padding: 8px 16px; border-radius: 20px; animation: pulse 1.5s infinite; }
+    
+    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255, 255, 255, 0.2); z-index: 1001; pointer-events: none; }
+    .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; }
+    
+    .skip-btn { position: absolute; bottom: 75px; right: 15px; background-color: rgba(0, 0, 0, 0.8); color: #ffffff; padding: 5px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); z-index: 2000; opacity: 1; pointer-events: none; transition: opacity 0.3s; }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+  
+  <div class="ad-badge" id="ad-badge-text">Ad</div>
+  <div class="sponsor-header">
+    <div class="sponsor-avatar" id="sponsor-icon">⚡️</div>
+    <div class="sponsor-text-group">
+      <p class="brand-name" id="brand-title">Sponsored Ad</p>
+      <p class="sponsored-tag" id="brand-sub">Advertising</p>
+    </div>
+  </div>
+  <div class="cta-banner" id="cta-banner">
+    <div class="cta-text">
+      <p class="cta-title" id="cta-headline">Advertisement Offer</p>
+      <p class="cta-subtitle" id="cta-subtext">Sponsored Content</p>
+    </div>
+    <div class="cta-button" id="cta-btn">Learn More ➔</div>
+  </div>
+  
+  <div class="progress-bg" id="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+  <div class="skip-btn" id="skip-btn">Loading...</div>
+
+  <!-- MEDIA ELEMENTS: decoding="sync" makes image load faster -->
+  <video id="vid" playsinline webkit-playsinline autoplay muted preload="auto"></video>
+  <img id="pic" fetchpriority="high" decoding="sync" />
+
+  <script>
+    // --- UI RANDOMIZER WITH ICONS ---
+    const adThemes = [
+      { brand: "Sponsored Ad", sub: "Advertising Network", badge: "Ad • 1 of 1", title: "Advertisement Feature", subtitle: "Sponsored Media Content", btnText: "Learn More ➔", accent: "#ffa31a", btnBg: "#ffa31a", btnColor: "#000000", icon: "⚡️" },
+      { brand: "Paid Advertising", sub: "Sponsored Partner", badge: "Ads", title: "Exclusive Advertisement", subtitle: "Sponsored Promotion", btnText: "View Ad ➔", accent: "#007aff", btnBg: "#007aff", btnColor: "#ffffff", icon: "💎" },
+      { brand: "Sponsored Feed", sub: "Ad Network", badge: "Ad (0:05)", title: "Advertising Display", subtitle: "Sponsored Clip Showcase", btnText: "Open Ad ➔", accent: "#ff3333", btnBg: "#ff3333", btnColor: "#ffffff", icon: "🚀" }
+    ];
+    const currentTheme = adThemes[Math.floor(Math.random() * adThemes.length)];
+    
+    document.getElementById('ad-badge-text').innerText = currentTheme.badge;
+    document.getElementById('brand-title').innerText = currentTheme.brand;
+    document.getElementById('brand-sub').innerText = currentTheme.sub;
+    document.getElementById('cta-headline').innerText = currentTheme.title;
+    document.getElementById('cta-subtext').innerText = currentTheme.subtitle;
+    document.getElementById('sponsor-icon').innerText = currentTheme.icon;
+    
+    const actionBtn = document.getElementById('cta-btn');
+    actionBtn.innerText = currentTheme.btnText;
+    actionBtn.style.background = currentTheme.btnBg;
+    actionBtn.style.color = currentTheme.btnColor;
+    document.getElementById('progress-bar').style.background = currentTheme.accent;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const mediaLink = urlParams.get('media'); 
+    const timeJump = urlParams.get('jump');
+
+    const vid = document.getElementById('vid');
+    const pic = document.getElementById('pic');
+    const skipBtn = document.getElementById('skip-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    
+    let canSkip = false;
+
+    if (mediaLink) {
+      const isVideo = mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov');
+      
+      if (isVideo) {
+        // --- VIDEO MODE ---
+        vid.style.display = 'block'; 
+        vid.src = mediaLink;
+        
+        let jumpSeconds = 0;
+        if (timeJump && !isNaN(timeJump)) {
+          jumpSeconds = parseFloat(timeJump) * 60;
+        }
+
+        vid.addEventListener('loadedmetadata', function() {
+          if (jumpSeconds > 0 && jumpSeconds < vid.duration) {
+            vid.currentTime = jumpSeconds;
+          }
+        });
+
+        vid.muted = true;
+        vid.defaultMuted = true;
+        vid.playsInline = true;
+
+        function forcePlay() {
+          let playPromise = vid.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              skipBtn.innerText = "Tap screen to play";
+              skipBtn.style.pointerEvents = 'auto'; 
+            });
+          }
+        }
+        
+        vid.onloadeddata = forcePlay;
+        if (vid.readyState >= 2) forcePlay();
+
+        document.body.addEventListener('click', function(e) {
+          if (e.target !== skipBtn && vid.paused) vid.play().catch(() => {});
+        });
+
+        vid.ontimeupdate = function() {
+          if (vid.duration) {
+            let percentage = (vid.currentTime / vid.duration) * 100;
+            progressBar.style.width = percentage + "%";
+            
+            if (!canSkip) {
+              let timeLeft = Math.ceil(vid.duration - vid.currentTime);
+              if (timeLeft > 0) {
+                skipBtn.innerText = "Skip ad in " + timeLeft;
+              } else {
+                skipBtn.innerText = "Skip Ad";
+                skipBtn.style.pointerEvents = 'auto';
+                canSkip = true;
+              }
+            }
+          }
+        };
+
+        vid.onended = function() {
+          vid.play(); 
+          if (!canSkip) {
+            skipBtn.innerText = "Skip Ad";
+            skipBtn.style.pointerEvents = 'auto';
+            canSkip = true;
+          }
+        };
+
+      } else {
+        // --- PHOTO MODE ---
+        pic.style.display = 'block'; 
+        pic.src = mediaLink;
+        progressContainer.style.display = 'none'; 
+        
+        let photoTimeLeft = 10;
+        skipBtn.innerText = "Skip ad in " + photoTimeLeft;
+        
+        let photoTimer = setInterval(() => {
+          photoTimeLeft--;
+          if (photoTimeLeft > 0) {
+            skipBtn.innerText = "Skip ad in " + photoTimeLeft;
+          } else {
+            skipBtn.innerText = "Skip Ad";
+            skipBtn.style.pointerEvents = 'auto';
+            canSkip = true;
+            clearInterval(photoTimer);
+          }
+        }, 1000);
+      }
+    } else {
+      skipBtn.innerText = "Skip Ad";
+      skipBtn.style.pointerEvents = 'auto';
+      canSkip = true;
+    }
+
+    // --- CLICK SKIP LOGIC ---
+    skipBtn.addEventListener('click', function(e) {
+      e.preventDefault(); e.stopPropagation(); 
+      if (!canSkip) return; 
+      
+      const isVideo = mediaLink && (mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov'));
+      if (isVideo && !vid.paused === false) return; 
+      
+      window.open("https://www.google.com", '_blank');
+    });
+  </script>
+</body>
+</html>
