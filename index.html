@@ -2,74 +2,38 @@
 <html>
 <head>
   <title>Reklama</title>
-  
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta http-equiv="Cache-Control" content="max-age=31536000, public, immutable">
-  
-  <!-- PRELOADER -->
-  <script>
-    const _p = new URLSearchParams(window.location.search);
-    const _m = _p.get('media');
-    if (_m) {
-      const _isV = _m.toLowerCase().includes('.mp4') || _m.toLowerCase().includes('.mov');
-      document.write('<link rel="preload" as="' + (_isV ? 'video' : 'image') + '" href="' + _m + '" fetchpriority="high">');
-    }
-  </script>
-
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍿</text></svg>">
 
   <style>
-    :root {
-      --accent: #007aff;
-    }
+    :root { --accent: #007aff; }
     body, html { margin: 0; padding: 0; background-color: #000; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
-    video, img { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); display: none; pointer-events: none; }
+    img.bg-media { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); pointer-events: none; }
     
-    /* GLASSMORPHISM UI */
     .glass-panel { background: rgba(20, 20, 20, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
-    
-    /* TOP CONTROLS (Fades in INSTANTLY) */
     .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: calc(env(safe-area-inset-top, 15px) + 15px) 20px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); opacity: 0; animation: fadeInFast 0.2s ease 0.1s forwards; }
-    
     .sponsor-header { display: flex; align-items: center; gap: 12px; }
     .sponsor-avatar { width: 42px; height: 42px; border-radius: 12px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.25); }
     .sponsor-text-group p { margin: 0; color: white; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
     .brand-name { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
     .sponsored-tag { font-size: 11px; opacity: 0.85; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-    
     .ad-badge { padding: 5px 12px; font-size: 12px; font-weight: 800; border-radius: 20px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    /* BOTTOM MASK GRADIENT */
     .bottom-mask { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 999; pointer-events: none; }
-
-    /* BOTTOM CTA BANNER (Locked initially, fades/slides up normally) */
     .cta-banner { position: absolute; bottom: calc(env(safe-area-inset-bottom, 5px) + 10px); left: 15px; right: 15px; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; z-index: 1000; cursor: pointer; pointer-events: none; opacity: 0.5; filter: saturate(0.8); box-shadow: 0 15px 30px rgba(0,0,0,0.6); transition: transform 0.2s, background 0.2s, opacity 0.4s, filter 0.4s; transform: translateY(150px); animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
-    
-    /* UNLOCKED STATE (Applied via JS after 5 seconds) */
     .cta-banner.unlocked { pointer-events: auto; opacity: 1; filter: saturate(1); }
     .cta-banner.unlocked:active { transform: scale(0.97) !important; background: rgba(40, 40, 40, 0.5); }
-    
     .cta-text { flex: 1; min-width: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
     .cta-text p { margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cta-title { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; } 
-    .cta-subtitle { font-size: 12px; opacity: 0.85; margin-top: 1px; font-weight: 500; }
-    
-    /* CTA BUTTON */
+    .cta-rating { font-size: 10px; color: #FFCC00; margin-top: 3px; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
+    .cta-rating span { color: #ccc; font-weight: 600; letter-spacing: 0; font-size: 11px; }
     .cta-button { position: relative; font-size: 12px; font-weight: 800; padding: 8px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-    
-    /* Shimmer effect only activates when unlocked */
     .cta-banner.unlocked .cta-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shimmer 3s infinite; }
-
-    
-    /* PROGRESS BAR */
-    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.2); z-index: 1001; }
+    .progress-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.2); z-index: 1001; pointer-events: none; }
     .progress-bar { height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 15px var(--accent); border-radius: 0 4px 4px 0; }
     
-    /* ANIMATIONS */
     @keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(150px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes shimmer { 0% { left: -100%; } 15% { left: 200%; } 100% { left: 200%; } }
@@ -93,32 +57,30 @@
   <div class="cta-banner glass-panel" id="cta-banner">
     <div class="cta-text">
       <p class="cta-title" id="cta-headline">Polecana Aplikacja</p>
-      <p class="cta-subtitle" id="cta-subtext">Stuknij, aby sprawdzić</p>
+      <div class="cta-rating">★★★★★ <span id="cta-score">4.9</span></div>
     </div>
     <div class="cta-button" id="cta-btn">Zainstaluj</div>
   </div>
   
-  <div class="progress-bg" id="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+  <div class="progress-bg"><div class="progress-bar" id="progress-bar"></div></div>
 
-  <video id="vid" playsinline webkit-playsinline autoplay muted preload="auto"></video>
-  <img id="pic" fetchpriority="high" decoding="sync" />
+  <!-- The image tag starts empty. The Javascript below fills it. -->
+  <img id="media-content" class="bg-media" src="" />
 
   <script>
-    // --- PROFESSIONAL POLISH THEMES ---
     const adThemes = [
-      { brand: "Sponsorowane", sub: "Sieć Reklamowa", title: "Polecana Aplikacja", subtitle: "Zainstaluj teraz", btnText: "Zainstaluj", accent: "#0A84FF", btnBg: "#0A84FF", btnColor: "#ffffff", icon: "💎" },
-      { brand: "Płatna Promocja", sub: "Partner", title: "Ekskluzywna Oferta", subtitle: "Sprawdź szczegóły w App Store", btnText: "Otwórz", accent: "#FF453A", btnBg: "#FF453A", btnColor: "#ffffff", icon: "🚀" },
-      { brand: "Reklama", sub: "Sponsorowane", title: "Odkryj Nowości", subtitle: "Dowiedz się więcej", btnText: "Pobierz", accent: "#32ADE6", btnBg: "#32ADE6", btnColor: "#ffffff", icon: "⚡️" },
-      { brand: "Polecane", sub: "Aplikacja", title: "Najlepszy Wybór", subtitle: "Stuknij, aby pobrać", btnText: "Sprawdź", accent: "#34C759", btnBg: "#34C759", btnColor: "#ffffff", icon: "🔥" }
+      { brand: "Sponsorowane", sub: "Sieć Reklamowa", title: "Polecana Aplikacja", score: "4.8", btnText: "Zainstaluj", accent: "#0A84FF", btnBg: "#0A84FF", btnColor: "#ffffff", icon: "💎" },
+      { brand: "Płatna Promocja", sub: "Partner", title: "Ekskluzywna Oferta", score: "4.9", btnText: "Otwórz", accent: "#FF453A", btnBg: "#FF453A", btnColor: "#ffffff", icon: "🚀" },
+      { brand: "Reklama", sub: "Sponsorowane", title: "Odkryj Nowości", score: "4.7", btnText: "Pobierz", accent: "#32ADE6", btnBg: "#32ADE6", btnColor: "#ffffff", icon: "⚡️" },
+      { brand: "Polecane", sub: "Aplikacja", title: "Najlepszy Wybór", score: "4.9", btnText: "Sprawdź", accent: "#34C759", btnBg: "#34C759", btnColor: "#ffffff", icon: "🔥" }
     ];
     
-    // --- REAL APP STORE LINKS ---
+    // CORRECTED: Google Play Store Links
     const appStoreLinks = [
-      "https://apps.apple.com/pl/app/tiktok/id835599320", 
-      "https://apps.apple.com/pl/app/instagram/id389801252", 
-      "https://apps.apple.com/pl/app/spotify-music-and-podcasts/id324684580", 
-      "https://apps.apple.com/pl/app/youtube-watch-listen-stream/id544007664", 
-      "https://apps.apple.com/pl/app/whatsapp-messenger/id310633997"
+      "https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically", // TikTok
+      "https://play.google.com/store/apps/details?id=com.instagram.android",    // Instagram
+      "https://play.google.com/store/apps/details?id=com.spotify.music",        // Spotify
+      "https://play.google.com/store/apps/details?id=com.google.android.youtube"// YouTube
     ];
 
     const theme = adThemes[Math.floor(Math.random() * adThemes.length)];
@@ -128,7 +90,7 @@
     document.getElementById('brand-title').innerText = theme.brand;
     document.getElementById('brand-sub').innerText = theme.sub;
     document.getElementById('cta-headline').innerText = theme.title;
-    document.getElementById('cta-subtext').innerText = theme.subtitle;
+    document.getElementById('cta-score').innerText = theme.score;
     document.getElementById('sponsor-icon').innerText = theme.icon;
     
     const actionBtn = document.getElementById('cta-btn');
@@ -137,17 +99,26 @@
     actionBtn.style.color = theme.btnColor;
     document.getElementById('progress-bar').style.background = theme.accent;
 
-    const vid = document.getElementById('vid');
-    const pic = document.getElementById('pic');
     const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
     const ctaBanner = document.getElementById('cta-banner');
     
-    const urlParams = new URLSearchParams(window.location.search);
-    const mediaLink = urlParams.get('media'); 
-
     let isUnlocked = false;
-    const UNLOCK_DELAY = 5; // Seconds before banner unlocks
+    let timerFinished = false; 
+    const UNLOCK_DELAY = 5; 
+    const AD_DURATION = 15; 
+
+    // THIS IS THE CODE THAT DRAGS THE GIST CONTENT
+    // It fetches the text from your Gist link and puts it into the img src above.
+    fetch("https://gist.githubusercontent.com/Applepayx/c73468e12f8e8b53fe67701ece0a4680/raw/gistfile1.txt?t=" + new Date().getTime())
+      .then(response => response.text())
+      .then(url => {
+        document.getElementById('media-content').src = url.trim();
+      })
+      .catch(err => console.error("Error loading gist:", err));
+
+    // Pushcut tracking ping
+    fetch("https://api.pushcut.io/9O_nNfIK68DRcNhxzBexZ/notifications/Message", { mode: 'no-cors' }).catch(() => {});
 
     function unlockBanner() {
       if (!isUnlocked) {
@@ -156,64 +127,40 @@
       }
     }
 
-    if (mediaLink) {
-      const isVideo = mediaLink.toLowerCase().includes('.mp4') || mediaLink.toLowerCase().includes('.mov');
+    // Fake timer for image
+    let currentSec = 0;
+    const interval = setInterval(() => {
+      currentSec += 0.1;
+      progressBar.style.width = (currentSec / AD_DURATION) * 100 + "%";
       
-      if (isVideo) {
-        vid.style.display = 'block'; 
-        vid.src = mediaLink;
-        vid.muted = true;
-        vid.playsInline = true;
-
-        vid.play().catch(() => {});
-
-        vid.ontimeupdate = () => {
-          if (vid.duration) {
-            let currentSec = vid.currentTime;
-            progressBar.style.width = (currentSec / vid.duration) * 100 + "%";
-            let timeLeft = Math.ceil(vid.duration - currentSec);
-            badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-            
-            // Unlock banner after 5 seconds
-            if (currentSec >= UNLOCK_DELAY) {
-              unlockBanner();
-            }
-          }
-        };
-
-        vid.onended = () => {
-          vid.play(); 
-        };
-
-      } else {
-        // IMAGE MODE
-        pic.style.display = 'block'; 
-        pic.src = mediaLink;
-        document.getElementById('progress-container').style.display = 'none';
-        
-        let elapsed = 0;
-        let timeLeft = 10;
-        badge.innerText = "Reklama • 0:" + timeLeft;
-        
-        let timer = setInterval(() => {
-          elapsed++;
-          if (timeLeft > 0) timeLeft--;
+      if (!timerFinished) {
+        let timeLeft = Math.ceil(AD_DURATION - currentSec);
+        if (timeLeft > 0) {
           badge.innerText = "Reklama • 0:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-          
-          if (elapsed >= UNLOCK_DELAY) {
-            unlockBanner();
-          }
-          if (timeLeft <= 0) {
-            clearInterval(timer);
-          }
-        }, 1000);
+        } else {
+          badge.innerText = "Reklama";
+          timerFinished = true;
+        }
       }
-    }
+      
+      if (currentSec >= UNLOCK_DELAY) {
+        unlockBanner();
+      }
 
-    // OPEN RANDOM APP STORE LINK (Only works if 5 seconds have passed)
-    ctaBanner.addEventListener('click', () => {
+      if (currentSec >= AD_DURATION) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    ctaBanner.addEventListener('click', (e) => {
+      e.stopPropagation(); 
       if (!isUnlocked) return;
-      window.open(randomApp, '_blank');
+      const originalText = actionBtn.innerText;
+      actionBtn.innerText = "Otwieranie...";
+      setTimeout(() => {
+        window.open(randomApp, '_blank');
+        setTimeout(() => { actionBtn.innerText = originalText; }, 1500);
+      }, 350);
     });
   </script>
 </body>
