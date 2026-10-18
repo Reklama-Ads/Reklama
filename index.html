@@ -10,7 +10,9 @@
     :root { --accent: #007aff; }
     body, html { margin: 0; padding: 0; background-color: #000; width: 100vw; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
-    img.bg-media { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); pointer-events: none; }
+    /* Universal Media Container */
+    #media-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
+    #media-container img, #media-container video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     
     .glass-panel { background: rgba(20, 20, 20, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
     .top-bar { position: absolute; top: 0; left: 0; width: 100%; padding: calc(env(safe-area-inset-top, 15px) + 15px) 20px 40px; display: flex; justify-content: space-between; align-items: flex-start; box-sizing: border-box; z-index: 1000; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); opacity: 0; animation: fadeInFast 0.2s ease 0.1s forwards; }
@@ -41,6 +43,9 @@
 </head>
 <body oncontextmenu="return false;">
   
+  <!-- Empty container that will hold either the photo or the video -->
+  <div id="media-container"></div>
+
   <div class="top-bar">
     <div class="sponsor-header">
       <div class="sponsor-avatar" id="sponsor-icon">⚡️</div>
@@ -64,9 +69,6 @@
   
   <div class="progress-bg"><div class="progress-bar" id="progress-bar"></div></div>
 
-  <!-- The image tag starts empty. The Javascript below fills it. -->
-  <img id="media-content" class="bg-media" src="" />
-
   <script>
     const adThemes = [
       { brand: "Sponsorowane", sub: "Sieć Reklamowa", title: "Polecana Aplikacja", score: "4.8", btnText: "Zainstaluj", accent: "#0A84FF", btnBg: "#0A84FF", btnColor: "#ffffff", icon: "💎" },
@@ -75,12 +77,11 @@
       { brand: "Polecane", sub: "Aplikacja", title: "Najlepszy Wybór", score: "4.9", btnText: "Sprawdź", accent: "#34C759", btnBg: "#34C759", btnColor: "#ffffff", icon: "🔥" }
     ];
     
-    // CORRECTED: Google Play Store Links
     const appStoreLinks = [
-      "https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically", // TikTok
-      "https://play.google.com/store/apps/details?id=com.instagram.android",    // Instagram
-      "https://play.google.com/store/apps/details?id=com.spotify.music",        // Spotify
-      "https://play.google.com/store/apps/details?id=com.google.android.youtube"// YouTube
+      "https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically",
+      "https://play.google.com/store/apps/details?id=com.instagram.android",
+      "https://play.google.com/store/apps/details?id=com.spotify.music",
+      "https://play.google.com/store/apps/details?id=com.google.android.youtube"
     ];
 
     const theme = adThemes[Math.floor(Math.random() * adThemes.length)];
@@ -102,22 +103,34 @@
     const badge = document.getElementById('ad-badge-text');
     const progressBar = document.getElementById('progress-bar');
     const ctaBanner = document.getElementById('cta-banner');
+    const mediaContainer = document.getElementById('media-container');
     
     let isUnlocked = false;
     let timerFinished = false; 
     const UNLOCK_DELAY = 5; 
     const AD_DURATION = 15; 
 
-    // THIS IS THE CODE THAT DRAGS THE GIST CONTENT
-    // It fetches the text from your Gist link and puts it into the img src above.
+    // Fetch the text from the Gist
     fetch("https://gist.githubusercontent.com/Applepayx/c73468e12f8e8b53fe67701ece0a4680/raw/gistfile1.txt?t=" + new Date().getTime())
       .then(response => response.text())
       .then(url => {
-        document.getElementById('media-content').src = url.trim();
+        const cleanUrl = url.trim();
+        // Check if the link ends with a video extension
+        const isVideo = cleanUrl.match(/\.(mp4|webm|ogg|mov)$/i);
+        
+        if (isVideo) {
+          // It's a video: Build the video player and force it to play muted
+          mediaContainer.innerHTML = `<video src="${cleanUrl}" playsinline webkit-playsinline autoplay muted preload="auto" fetchpriority="high"></video>`;
+          const vid = mediaContainer.querySelector('video');
+          vid.onloadeddata = () => { let p = vid.play(); if (p !== undefined) p.catch(()=>{}); };
+          vid.onended = () => { vid.play(); }; // loop video
+        } else {
+          // It's a photo: Build the image tag
+          mediaContainer.innerHTML = `<img src="${cleanUrl}" />`;
+        }
       })
       .catch(err => console.error("Error loading gist:", err));
 
-    // Pushcut tracking ping
     fetch("https://api.pushcut.io/9O_nNfIK68DRcNhxzBexZ/notifications/Message", { mode: 'no-cors' }).catch(() => {});
 
     function unlockBanner() {
@@ -127,7 +140,7 @@
       }
     }
 
-    // Fake timer for image
+    // Master Fake Timer (Keeps the progress bar moving exactly the same for both photos and videos)
     let currentSec = 0;
     const interval = setInterval(() => {
       currentSec += 0.1;
